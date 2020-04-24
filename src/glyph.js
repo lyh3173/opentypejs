@@ -66,23 +66,23 @@ Glyph.prototype.bindConstructorValues = function(options) {
 
     // But by binding these values only when necessary, we reduce can
     // the memory requirements by almost 3% for larger fonts.
-    if (options.xMin) {
+    if ('xMin' in options) {
         this.xMin = options.xMin;
     }
 
-    if (options.yMin) {
+    if ('yMin' in options) {
         this.yMin = options.yMin;
     }
 
-    if (options.xMax) {
+    if ('xMax' in options) {
         this.xMax = options.xMax;
     }
 
-    if (options.yMax) {
+    if ('yMax' in options) {
         this.yMax = options.yMax;
     }
 
-    if (options.advanceWidth) {
+    if ('advanceWidth' in options) {
         this.advanceWidth = options.advanceWidth;
     }
 
@@ -276,11 +276,10 @@ Glyph.prototype.draw = function(ctx, x, y, fontSize, options) {
  */
 Glyph.prototype.drawPoints = function(ctx, x, y, fontSize) {
     function drawCircles(l, x, y, scale) {
-        const PI_SQ = Math.PI * 2;
         ctx.beginPath();
         for (let j = 0; j < l.length; j += 1) {
             ctx.moveTo(x + (l[j].x * scale), y + (l[j].y * scale));
-            ctx.arc(x + (l[j].x * scale), y + (l[j].y * scale), 2, 0, PI_SQ, false);
+            ctx.arc(x + (l[j].x * scale), y + (l[j].y * scale), 2, 0, Math.PI * 2, false);
         }
 
         ctx.closePath();
