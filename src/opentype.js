@@ -307,10 +307,12 @@ function parseBuffer(buffer, opt) {
                 break;
         }
     }
+    if (nameTableEntry) { // 没有name 不解析naming table
+        const nameTable = uncompressTable(data, nameTableEntry);
+        font.tables.name = _name.parse(nameTable.data, nameTable.offset, ltagTable);
+        font.names = font.tables.name;
+    }
 
-    const nameTable = uncompressTable(data, nameTableEntry);
-    font.tables.name = _name.parse(nameTable.data, nameTable.offset, ltagTable);
-    font.names = font.tables.name;
 
     if (glyfTableEntry && locaTableEntry) {
         const shortVersion = indexToLocFormat === 0;
