@@ -54,7 +54,7 @@ GlyphSet.prototype.get = function(index) {
         }
 
         let glyph = this.glyphs[index];
-        let unicodeObj = this.font._IndexToUnicodeMap[index];
+        let unicodeObj = this.font._IndexToUnicodeMap ? this.font._IndexToUnicodeMap[index] : undefined;
 
         if (unicodeObj) {
             for (let j = 0; j < unicodeObj.unicodes.length; j++)

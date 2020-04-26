@@ -243,9 +243,9 @@ GlyphNames.prototype.glyphIndexToName = function(gid) {
     return this.names[gid];
 };
 
-function addGlyphNamesAll(font) {
+function addGlyphNamesAll(font, opt) {
     let glyph;
-    const glyphIndexMap = font.tables.cmap.glyphIndexMap;
+    const glyphIndexMap = font.tables.cmap ? font.tables.cmap.glyphIndexMap : opt.glyphIndexMap;
     const charCodes = Object.keys(glyphIndexMap);
 
     for (let i = 0; i < charCodes.length; i += 1) {
@@ -269,10 +269,9 @@ function addGlyphNamesAll(font) {
     }
 }
 
-function addGlyphNamesToUnicodeMap(font) {
+function addGlyphNamesToUnicodeMap(font, opt) {
     font._IndexToUnicodeMap = {};
-
-    const glyphIndexMap = font.tables.cmap.glyphIndexMap;
+    const glyphIndexMap = font.tables.cmap ? font.tables.cmap.glyphIndexMap : opt.glyphIndexMap;
     const charCodes = Object.keys(glyphIndexMap);
 
     for (let i = 0; i < charCodes.length; i += 1) {
@@ -294,10 +293,11 @@ function addGlyphNamesToUnicodeMap(font) {
  * @param {Object}
  */
 function addGlyphNames(font, opt) {
+    if (!opt.glyphIndexMap) opt.glyphIndexMap = {}
     if (opt.lowMemory) {
-        addGlyphNamesToUnicodeMap(font);
+        addGlyphNamesToUnicodeMap(font, opt);
     } else {
-        addGlyphNamesAll(font);
+        addGlyphNamesAll(font, opt);
     }
 }
 
