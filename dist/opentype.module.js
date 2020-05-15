@@ -1,5 +1,5 @@
 /**
- * https://opentype.js.org v1.3.3 | (c) Frederik De Bleser and other contributors | MIT License | Uses tiny-inflate by Devon Govett and string.prototype.codepointat polyfill by Mathias Bynens
+ * https://opentype.js.org v1.3.5 | (c) Frederik De Bleser and other contributors | MIT License | Uses tiny-inflate by Devon Govett and string.prototype.codepointat polyfill by Mathias Bynens
  */
 
 /*! https://mths.be/codepointat v0.2.0 by @mathias */
@@ -3236,9 +3236,9 @@ GlyphNames.prototype.glyphIndexToName = function(gid) {
     return this.names[gid];
 };
 
-function addGlyphNamesAll(font) {
+function addGlyphNamesAll(font, opt) {
     var glyph;
-    var glyphIndexMap = font.tables.cmap.glyphIndexMap;
+    var glyphIndexMap = font.tables.cmap ? font.tables.cmap.glyphIndexMap : opt.glyphIndexMap;
     var charCodes = Object.keys(glyphIndexMap);
 
     for (var i = 0; i < charCodes.length; i += 1) {
@@ -3256,16 +3256,15 @@ function addGlyphNamesAll(font) {
             } else {
                 glyph.name = font.cffEncoding.charset[i$1];
             }
-        } else if (font.glyphNames.names) {
+        } else if (font.glyphNames && font.glyphNames.names) {
             glyph.name = font.glyphNames.glyphIndexToName(i$1);
         }
     }
 }
 
-function addGlyphNamesToUnicodeMap(font) {
+function addGlyphNamesToUnicodeMap(font, opt) {
     font._IndexToUnicodeMap = {};
-
-    var glyphIndexMap = font.tables.cmap.glyphIndexMap;
+    var glyphIndexMap = font.tables.cmap ? font.tables.cmap.glyphIndexMap : opt.glyphIndexMap;
     var charCodes = Object.keys(glyphIndexMap);
 
     for (var i = 0; i < charCodes.length; i += 1) {
@@ -3287,10 +3286,11 @@ function addGlyphNamesToUnicodeMap(font) {
  * @param {Object}
  */
 function addGlyphNames(font, opt) {
+    if (!opt.glyphIndexMap) { opt.glyphIndexMap = {}; }
     if (opt.lowMemory) {
-        addGlyphNamesToUnicodeMap(font);
+        addGlyphNamesToUnicodeMap(font, opt);
     } else {
-        addGlyphNamesAll(font);
+        addGlyphNamesAll(font, opt);
     }
 }
 
@@ -3716,7 +3716,7 @@ GlyphSet.prototype.get = function(index) {
         }
 
         var glyph = this.glyphs[index];
-        var unicodeObj = this.font._IndexToUnicodeMap[index];
+        var unicodeObj = this.font._IndexToUnicodeMap ? this.font._IndexToUnicodeMap[index] : undefined;
 
         if (unicodeObj) {
             for (var j = 0; j < unicodeObj.unicodes.length; j++)
@@ -14110,10 +14110,12 @@ function parseBuffer(buffer, opt) {
                 break;
         }
     }
+    if (nameTableEntry) { // 没有name 不解析naming table
+        var nameTable = uncompressTable(data, nameTableEntry);
+        font.tables.name = _name.parse(nameTable.data, nameTable.offset, ltagTable);
+        font.names = font.tables.name;
+    }
 
-    var nameTable = uncompressTable(data, nameTableEntry);
-    font.tables.name = _name.parse(nameTable.data, nameTable.offset, ltagTable);
-    font.names = font.tables.name;
 
     if (glyfTableEntry && locaTableEntry) {
         var shortVersion = indexToLocFormat === 0;
